@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import '@syncfusion/ej2-react-calendars/styles/tailwind.css'
+import '@syncfusion/ej2-icons/styles/material3.css'
+import '@syncfusion/ej2-react-calendars/styles/material3.css'
 import './App.css'
 import { SBDateRangePicker } from './MuiDateRangePicker'
 import { SBDateRangePickerCustom } from './CustomDateRangePicker'

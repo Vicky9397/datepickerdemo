@@ -1,15 +1,21 @@
 import { registerLicense } from "@syncfusion/ej2-base";
-import { DateRangePickerComponent } from "@syncfusion/ej2-react-calendars";
+import {
+    DateRangePickerComponent,
+    PresetsDirective,
+    PresetDirective,
+} from "@syncfusion/ej2-react-calendars";
 
 /* ============================================================
  * SBDateRangePickerPaid - sample wrapper around the commercial
  * Syncfusion DateRangePicker (@syncfusion/ej2-react-calendars).
  *
  * Included so the paid/licensed option can be compared side by
- * side with the custom and MUI pickers on the same criterion:
- * keyboard usability. Syncfusion uses a single editable field
- * ("start - end") plus a range calendar popup, so it shows a
- * different keyboard model from the two segmented pickers.
+ * side with the custom and MUI pickers. Syncfusion uses a single
+ * editable field plus a rich range popup; the popup is where the
+ * paid value shows: quick-select PRESETS, a two-month view, a
+ * live day-span count, and Apply/Cancel. Those presets are the
+ * clearest "this is an enterprise component" signal, so they are
+ * wired up here.
  *
  * Public contract matches the other two pickers:
  *   onChange: (e) => void          where e.value = { start, end }
@@ -30,6 +36,22 @@ if (LICENSE_KEY) {
         /* malformed key - fall back to the trial notice */
     }
 }
+
+// Quick-select ranges shown in the popup sidebar (computed relative to today).
+const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const shiftDays = (d, n) => {
+    const x = startOfDay(d);
+    x.setDate(x.getDate() + n);
+    return x;
+};
+const TODAY = startOfDay(new Date());
+const PRESETS = [
+    { label: "Today", start: TODAY, end: TODAY },
+    { label: "Last 7 days", start: shiftDays(TODAY, -6), end: TODAY },
+    { label: "Last 30 days", start: shiftDays(TODAY, -29), end: TODAY },
+    { label: "This month", start: new Date(TODAY.getFullYear(), TODAY.getMonth(), 1), end: TODAY },
+    { label: "This year", start: new Date(TODAY.getFullYear(), 0, 1), end: TODAY },
+];
 
 export const SBDateRangePickerPaid = ({
     onChange,
@@ -61,8 +83,15 @@ export const SBDateRangePickerPaid = ({
         <DateRangePickerComponent
             format="MM/dd/yyyy"
             placeholder="MM/DD/YYYY – MM/DD/YYYY"
+            showClearButton
             change={handleChange}
             {...props}
-        />
+        >
+            <PresetsDirective>
+                {PRESETS.map((p) => (
+                    <PresetDirective key={p.label} label={p.label} start={p.start} end={p.end} />
+                ))}
+            </PresetsDirective>
+        </DateRangePickerComponent>
     );
 };
