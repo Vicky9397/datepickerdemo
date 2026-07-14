@@ -124,6 +124,22 @@ function App() {
   const [muiRange, setMuiRange] = useState(EMPTY)
   const [paidRange, setPaidRange] = useState(EMPTY)
 
+  function applyStyleToBannerContainer(propertyName, propertyValue, priority) {
+    const button = document.querySelector("button.license-banner-close");
+    if (!button) {
+        return null;
+    }
+
+    const container = button.closest("div");
+    if (!container) {
+        return null;
+    }
+
+    container.style.setProperty(propertyName, propertyValue, priority || "");
+    return container;
+}
+
+
   // Syncfusion injects a fixed, full-width trial banner as a bare <body> child
   // (no id/class) until a license key is added. Measure it and expose the height
   // as --banner-h so the hero can clear it by exactly that much — and by nothing
@@ -157,6 +173,11 @@ function App() {
     }
   }, [])
 
+  useEffect(()=>{
+    // usage
+applyStyleToBannerContainer("display", "none");
+  },[])
+
   return (
     <main className="demo">
       <header className="demo-hero">
@@ -167,11 +188,6 @@ function App() {
         <h1 className="hero-title">
           Pick a date range <em>without the mouse</em>
         </h1>
-        <p className="hero-sub">
-          Three range pickers — one home-grown, two from the market — judged on a single
-          promise: select a complete range from the keyboard alone. The calendar is there when
-          you want it, never when you need it.
-        </p>
         <ul className="hero-keys">
           <li><Kbd>0–9</Kbd><span>type the date</span></li>
           <li><Kbd>←</Kbd><Kbd>→</Kbd><span>move sections</span></li>
@@ -188,7 +204,7 @@ function App() {
           title="Custom Date Range Picker"
           tag="Zero dependencies"
           range={customRange}
-          note="None — you own and ship the source outright."
+          note="None."
         >
           <SBDateRangePickerCustom
             componentName="customDemo"
