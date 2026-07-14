@@ -19,7 +19,9 @@
   flex: 1;
   width: 100%;
   box-sizing: border-box;
-  padding: 56px 40px 72px;
+  /* base top space + the measured height of Syncfusion's fixed trial banner
+     (see App.jsx). --banner-h is 0 once a license key removes the banner. */
+  padding: calc(36px + var(--banner-h, 0px)) 40px 72px;
   text-align: left;
   background: radial-gradient(1100px 440px at 50% -160px, var(--accent-bg), transparent 70%);
 }
@@ -39,7 +41,7 @@
 
 @media (max-width: 1024px) {
   .demo {
-    padding: 36px 20px 56px;
+    padding: calc(28px + var(--banner-h, 0px)) 20px 56px;
   }
 }
 
@@ -144,10 +146,10 @@
 
 .demo-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 28px;
   align-items: stretch;
-  max-width: 1040px;
+  max-width: 1240px;
   margin: 0 auto;
 }
 
@@ -232,9 +234,10 @@
   border-radius: 14px;
 }
 
-/* The MUI field ships a fixed 350px width; let it shrink on small
-   screens while keeping its intended size on wide ones. */
-.panel-stage :is(.MuiFormControl-root, .MuiTextField-root, .SbaDateRage) {
+/* The MUI and Syncfusion fields default to fixed/narrow widths; let them
+   fill the stage (and shrink on small screens) while capping the size so
+   all three pickers read at a consistent visual weight. */
+.panel-stage :is(.MuiFormControl-root, .MuiTextField-root, .SbaDateRage, .e-date-range-wrapper) {
   width: 100% !important;
   max-width: 350px;
 }
@@ -303,13 +306,35 @@
   overflow-wrap: anywhere;
 }
 
+.panel-note {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  margin: 12px 2px 0;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.note-label {
+  flex: none;
+  padding: 2px 7px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-bg);
+  border-radius: 6px;
+}
+
 /* ---------- keyboard reference ---------- */
 
 .demo-guide {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 28px;
-  max-width: 1040px;
+  max-width: 1240px;
   margin: 50px auto 0;
 }
 
@@ -379,7 +404,7 @@
 /* ---------- footer ---------- */
 
 .demo-foot {
-  max-width: 1040px;
+  max-width: 1240px;
   margin: 40px auto 0;
   text-align: center;
   font-size: 13.5px;
@@ -389,7 +414,6 @@
 /* ---------- responsive ---------- */
 
 @media (max-width: 880px) {
-  .demo-grid,
   .demo-guide {
     grid-template-columns: 1fr;
   }

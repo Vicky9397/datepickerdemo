@@ -14,6 +14,7 @@
     "@emotion/styled": "^11.14.1",
     "@mui/material": "^9.1.2",
     "@mui/x-date-pickers-pro": "^9.7.0",
+    "@syncfusion/ej2-react-calendars": "^34.1.29",
     "dayjs": "^1.11.21",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"

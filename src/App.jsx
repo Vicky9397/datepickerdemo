@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import '@syncfusion/ej2-react-calendars/styles/tailwind.css'
 import './App.css'
 import { SBDateRangePicker } from './MuiDateRangePicker'
 import { SBDateRangePickerCustom } from './CustomDateRangePicker'
+import { SBDateRangePickerPaid } from './PaidDateRangePicker'
 
 const EMPTY = { start: null, end: null }
 
@@ -62,7 +64,7 @@ const CALENDAR_KEYS = [
   { keys: ['Esc'], desc: 'Close the calendar and keep typing' },
 ]
 
-function PickerPanel({ index, eyebrow, title, tag, children, range }) {
+function PickerPanel({ index, eyebrow, title, tag, children, range, note }) {
   const s = summarize(range)
   return (
     <article className="panel">
@@ -83,6 +85,12 @@ function PickerPanel({ index, eyebrow, title, tag, children, range }) {
         {s.aside && <span className="readout-aside">{s.aside}</span>}
       </div>
       {s.payload && <p className="panel-code">{s.payload}</p>}
+      {note && (
+        <p className="panel-note">
+          <span className="note-label">License</span>
+          <span>{note}</span>
+        </p>
+      )}
     </article>
   )
 }
@@ -114,6 +122,40 @@ function KeyGuide({ icon, title, subtitle, rows }) {
 function App() {
   const [customRange, setCustomRange] = useState(EMPTY)
   const [muiRange, setMuiRange] = useState(EMPTY)
+  const [paidRange, setPaidRange] = useState(EMPTY)
+
+  // Syncfusion injects a fixed, full-width trial banner as a bare <body> child
+  // (no id/class) until a license key is added. Measure it and expose the height
+  // as --banner-h so the hero can clear it by exactly that much — and by nothing
+  // once the component is licensed and the banner is gone. The full-width + top
+  // test keeps calendar popups (also portalled into <body>) from matching.
+  useEffect(() => {
+    const root = document.getElementById('root')
+    const syncBannerHeight = () => {
+      // Match the banner by its text so calendar popups (also fixed, also
+      // portalled into <body>, sometimes full-screen on mobile) never count.
+      const banner = [...document.body.children].find((el) => {
+        if (el === root || el.tagName !== 'DIV') return false
+        const rect = el.getBoundingClientRect()
+        if (getComputedStyle(el).position !== 'fixed' || rect.height === 0) return false
+        return /syncfusion|essential studio|license/i.test(el.textContent || '')
+      })
+      document.documentElement.style.setProperty(
+        '--banner-h',
+        banner ? `${banner.offsetHeight}px` : '0px'
+      )
+    }
+    syncBannerHeight()
+    const settle = setTimeout(syncBannerHeight, 300) // banner may mount after paint
+    const observer = new MutationObserver(syncBannerHeight)
+    observer.observe(document.body, { childList: true })
+    window.addEventListener('resize', syncBannerHeight)
+    return () => {
+      clearTimeout(settle)
+      observer.disconnect()
+      window.removeEventListener('resize', syncBannerHeight)
+    }
+  }, [])
 
   return (
     <main className="demo">
@@ -126,8 +168,9 @@ function App() {
           Pick a date range <em>without the mouse</em>
         </h1>
         <p className="hero-sub">
-          Two implementations, one promise: tab into the field, type the digits, and select a
-          complete range. The calendar is there when you want it — never when you need it.
+          Three range pickers — one home-grown, two from the market — judged on a single
+          promise: select a complete range from the keyboard alone. The calendar is there when
+          you want it, never when you need it.
         </p>
         <ul className="hero-keys">
           <li><Kbd>0–9</Kbd><span>type the date</span></li>
@@ -145,6 +188,7 @@ function App() {
           title="Custom Date Range Picker"
           tag="Zero dependencies"
           range={customRange}
+          note="None — you own and ship the source outright."
         >
           <SBDateRangePickerCustom
             componentName="customDemo"
@@ -156,10 +200,22 @@ function App() {
           index="02"
           eyebrow="MUI X Pro · dayjs"
           title="MUI Date Range Picker"
-          tag="Library component"
+          tag="Paid license"
           range={muiRange}
+          note="MUI X Pro (commercial) — the range picker is a paid feature."
         >
           <SBDateRangePicker componentName="muiDemo" onChange={(e) => setMuiRange(e.value)} />
+        </PickerPanel>
+
+        <PickerPanel
+          index="03"
+          eyebrow="Commercial · Syncfusion"
+          title="Syncfusion Date Range Picker"
+          tag="Paid license"
+          range={paidRange}
+          note="Syncfusion (commercial) — free Community License for small teams."
+        >
+          <SBDateRangePickerPaid componentName="paidDemo" onChange={(e) => setPaidRange(e.value)} />
         </PickerPanel>
       </section>
 
